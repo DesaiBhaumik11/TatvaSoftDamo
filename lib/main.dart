@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Tatvasoft Damo'),
+      home: MyHomePage(title: 'Damo'),
     );
   }
 }
@@ -33,7 +33,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    data = ApiCall().getData();
+    setState(() {
+      data = ApiCall().getData();
+    });
     // TODO: implement initState
     super.initState();
   }
@@ -52,37 +54,44 @@ class _MyHomePageState extends State<MyHomePage> {
               future: data,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  print(snapshot.data['data']);
-                  Map<String, dynamic> data = snapshot.data['data'];
-                  List<dynamic> user = data['users'];
-                  print(user);
+                  List<Users> user = snapshot.data;
                   return ListView.builder(
                       itemCount: user.length,
                       itemBuilder: (context, index) {
-                        List<dynamic> images = user[index]['items'];
-                        return Column(
-                          children: <Widget>[
-                            Row(
-                              children: <Widget>[
-                                CircleAvatar(
-                                  radius: 30,
-                                  backgroundImage:
-                                      NetworkImage('${user[index]['image']}'),
+                        List<String> images = user[index].items;
+                        print('${user[index].name} ,List length:${user[index].items.length}, Images List:${user[index].items}');
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: Column(
+                            children: <Widget>[
+                              Row(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage:
+                                          NetworkImage('${user[index].image}'),
+                                    ),
+                                  ),
+                                  Container(
+                                      margin: EdgeInsets.only(left: 10),
+                                      child: Text(
+                                        '${user[index].name}',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold),
+                                      ))
+                                ],
+                              ),
+                              Flexible(
+                                flex: 0,
+                                child: Container(
+                                    child: setImages(images),
                                 ),
-                                Container(
-                                    margin: EdgeInsets.only(left: 20),
-                                    child: Text(
-                                      '${user[index]['name']}',
-                                      style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold),
-                                    ))
-                              ],
-                            ),
-                            Container(
-                                child: setImages(images),
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         );
                       });
                 } else if (snapshot.hasError) {
@@ -94,35 +103,54 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   Widget setImages (List images){
     if (images.length % 2 == 0){
-      return GridView.count(
-        crossAxisCount: 2,
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          children: List.generate(images.length, (index) {
-            return  Container(
-              margin: EdgeInsets.all(10),
-              child: Image.network('${images[index]}'),
-            );
-          }),
-      );
-    } else
-      return Column(
-        children: <Widget>[
-          Container(
-            child: Image.network('${images[0]}'),
-            width: double.maxFinite,
-            height: 200,
-          ),
-          GridView.count(
-            shrinkWrap: true,
+      print("even no:${images.length}");
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: GridView.count(
+          crossAxisCount: 2,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
             physics: NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
+            shrinkWrap: true,
             children: List.generate(images.length, (index) {
               return  Container(
-                margin: EdgeInsets.all(10),
                 child: Image.network('${images[index]}'),
               );
-            }),),
+            }),
+        ),
+      );
+    } else
+      print("odd no:${images.length}");
+      print("odd no:${images.length}");
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Container(
+              child: Image.network('${images.elementAt(0)}', fit: BoxFit.cover,),
+              width: double.maxFinite,
+              height: 240,
+            ),
+          ),
+          Visibility(
+            visible: images.length == 1 ? false : true,
+            child: Padding(
+              padding: const EdgeInsets.only(left:8, right: 8, bottom: 8),
+              child: GridView.count(
+                shrinkWrap: true,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                physics: NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                children: List.generate(images.length - 1, (index) {
+                  List<String> image = images.sublist(1, images.length);
+                  return  Container(
+                    child: Image.network('${image[index]}'),
+                  );
+                }),),
+            ),
+          ),
         ],
       );
   }

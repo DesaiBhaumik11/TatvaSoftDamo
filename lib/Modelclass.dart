@@ -1,77 +1,47 @@
-// To parse this JSON data, do
-//
-//     final userData = userDataFromJson(jsonString);
 
-import 'dart:convert';
 
-UserData userDataFromJson(String str) => UserData.fromJson(json.decode(str));
-
-String userDataToJson(UserData data) => json.encode(data.toJson());
-
-class UserData {
-  UserData({
-    this.status,
-    this.message,
-    this.data,
-  });
-
+class UserData{
+  String message;
   bool status;
-  dynamic message;
   Data data;
 
-  factory UserData.fromJson(Map<String, dynamic> json) => UserData(
-    status: json["status"],
-    message: json["message"],
-    data: Data.fromJson(json["data"]),
-  );
+  UserData({this.message, this.status, this.data});
 
-  Map<String, dynamic> toJson() => {
-    "status": status,
-    "message": message,
-    "data": data.toJson(),
-  };
+  factory UserData.fromJson(Map<String, dynamic> json) {
+    return UserData(
+      status: json['status'],
+      message: json['message'],
+      data: Data.fromJson(json['data']),
+    );
+  }
 }
 
-class Data {
-  Data({
-    this.users,
-    this.hasMore,
-  });
-
-  List<User> users;
+class Data{
   bool hasMore;
+  List<Users> users;
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-    users: List<User>.from(json["users"].map((x) => User.fromJson(x))),
-    hasMore: json["has_more"],
-  );
+  Data({this.hasMore, this.users});
 
-  Map<String, dynamic> toJson() => {
-    "users": List<dynamic>.from(users.map((x) => x.toJson())),
-    "has_more": hasMore,
-  };
+  factory Data.fromJson(Map<String, dynamic> json) {
+    return Data(
+      hasMore: json['hasMore'],
+      users: List<dynamic>.from(json['users'].map((x) => Users.fromJson(x))),
+    );
+  }
 }
 
-class User {
-  User({
-    this.name,
-    this.image,
-    this.items,
-  });
-
+class Users{
   String name;
   String image;
-  List<String> items;
-
-  factory User.fromJson(Map<String, dynamic> json) => User(
-    name: json["name"],
-    image: json["image"],
-    items: List<String>.from(json["items"].map((x) => x)),
-  );
-
-  Map<String, dynamic> toJson() => {
-    "name": name,
-    "image": image,
-    "items": List<dynamic>.from(items.map((x) => x)),
-  };
+  List<String> items; 
+  
+  Users({this.name, this.image, this.items});
+  
+  factory Users.fromJson(Map<String, dynamic> json) {
+    return Users(
+      name: json['name'],
+      image: json['image'],
+      items: List<String>.from(json['items'].map((x) => x)),
+    );
+  }
 }
